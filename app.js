@@ -453,3 +453,159 @@
   window.addEventListener('resize', onScroll, { passive: true });
   draw();
 })();
+
+/* ============================================================
+   СТАТУС ПРЕДЛОЖЕНИЯ ПО КОДУ
+   API отдаёт только свою заявку по её коду — чужие тексты
+   недоступны, и это правильно: анкета анонимная.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var API = 'https://www.studyfreeforum.com';
+
+  var form   = document.getElementById('trackForm');
+  var input  = document.getElementById('trackCode');
+  var btn    = document.getElementById('trackBtn');
+  var msg    = document.getElementById('trackMsg');
+  var out    = document.getElementById('trackResult');
+  if (!form || !input || !btn || !msg || !out) return;
+
+  /* дата приходит как {_seconds}; показываем по-человечески */
+  function when(t) {
+    if (!t) return '';
+    var ms = typeof t === 'object' && t._seconds ? t._seconds * 1000 : Date.parse(t);
+    if (!ms || isNaN(ms)) return '';
+    try {
+      return new Date(ms).toLocaleDateString('ru-RU', {
+        day: 'numeric', month: 'long'
+      });
+    } catch (e) { return ''; }
+  }
+
+  /* статусы кабинета -> форма метки на странице.
+     Форма важнее цвета: так же, как у пунктов программы. */
+  function shape(status) {
+    if (/approved|accepted|done|complete|resolved/i.test(status)) return 'now';
+    if (/progress|review|work|pending/i.test(status))             return 'try';
+    if (/reject|declин|declined|closed/i.test(status))            return 'plan';
+    return 'try';
+  }
+
+  function esc(t) {
+    return String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function say(text, kind) {
+    msg.textContent = text;
+    msg.className = 'form-msg' + (kind ? ' form-msg--' + kind : '');
+  }
+
+  function render(sub) {
+    var kind = shape(sub.status || '');
+    var mark = kind === 'now'
+      ? '<circle cx="12" cy="12" r="7" fill="currentColor"/>'
+      : kind === 'try'
+        ? '<circle cx="12" cy="12" r="6.6" stroke="currentColor" stroke-width="2.6" stroke-dasharray="3 3"/>'
+        : '<circle cx="12" cy="12" r="6.6" stroke="currentColor" stroke-width="2.6"/>';
+
+    var html =
+      '<div class="track__card">' +
+        '<p class="track__code pix">' + esc(sub.code) + '</p>' +
+        '<span class="status status--' + kind + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' + mark + '</svg>' +
+          esc(sub.statusLabel || 'В работе') +
+        '</span>';
+
+    if (sub.createdAt) {
+      var d = when(sub.createdAt);
+      if (d) html += '<p class="track__date">подано ' + esc(d) + '</p>';
+    }
+
+    /* ответ партии: последняя заметка из истории — в цитату */
+    var history = Array.isArray(sub.history) ? sub.history : [];
+    var reply = null;
+    for (var i = history.length - 1; i >= 0; i--) {
+      var n = history[i] && history[i].note;
+      if (n && String(n).trim()) { reply = history[i]; break; }
+    }
+
+    if (reply) {
+      html +=
+        '<figure class="reply">' +
+          '<blockquote class="reply__text">' + esc(String(reply.note).trim()) + '</blockquote>' +
+          '<figcaption class="reply__from">' +
+            '<img src="img/sprite-musya.png" alt="" width="20" height="20">' +
+            'ответ партии <b>67</b>' +
+            (when(reply.at) ? ' · ' + esc(when(reply.at)) : '') +
+          '</figcaption>' +
+        '</figure>';
+    }
+
+    /* путь заявки: шаги, а не просто список */
+    if (history.length) {
+      html += '<ol class="steps">';
+      history.forEach(function (h, idx) {
+        var last = idx === history.length - 1;
+        html +=
+          '<li class="steps__i' + (last ? ' steps__i--last' : '') + '">' +
+            '<span class="steps__dot" aria-hidden="true"></span>' +
+            '<span class="steps__label">' + esc(h.label || h.status || '') + '</span>' +
+            (when(h.at) ? '<span class="steps__date">' + esc(when(h.at)) + '</span>' : '') +
+          '</li>';
+      });
+      html += '</ol>';
+    }
+
+    html +=
+      '<p class="track__more">' +
+        '<a href="' + API + '/track/' + encodeURIComponent(sub.code) + '" ' +
+           'target="_blank" rel="noopener">Открыть в кабинете</a>' +
+      '</p>' +
+      '</div>';
+
+    out.innerHTML = html;
+    out.hidden = false;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var code = input.value.trim().toUpperCase().replace(/\s+/g, '');
+    if (!code) {
+      say('Введи код — он выдаётся после отправки предложения.', 'warn');
+      input.focus();
+      return;
+    }
+
+    out.hidden = true;
+    out.innerHTML = '';
+    btn.disabled = true;
+    var restore = btn.textContent;
+    btn.textContent = 'Ищу…';
+    say('');
+
+    fetch(API + '/api/forms/track/' + encodeURIComponent(code))
+      .then(function (r) {
+        return r.json().then(function (j) { return { status: r.status, body: j }; });
+      })
+      .then(function (res) {
+        var j = res.body;
+        if (!j || !j.success || !j.submission) {
+          say(res.status === 404
+                ? 'Такого кода нет. Проверь, не потерялся ли символ.'
+                : (j && j.error) || 'Не получилось найти заявку.', 'warn');
+          return;
+        }
+        render(j.submission);
+      })
+      .catch(function () {
+        say('Нет связи с сервером. Попробуй позже.', 'warn');
+      })
+      .then(function () {
+        btn.disabled = false;
+        btn.textContent = restore;
+      });
+  });
+})();

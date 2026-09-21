@@ -1260,3 +1260,164 @@ input[type="file"].field {
   color: var(--red-deep);
   box-shadow: 0 2px 0 rgba(194,30,18,.28);
 }
+
+/* ============================================================
+   СТАТУС ПРЕДЛОЖЕНИЯ
+   Ответ партии — не системное уведомление, а записка
+   на полях: та же бумага, тот же почерк.
+   ============================================================ */
+
+.track__row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.track__input {
+  flex: 1 1 11ch;
+  min-width: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(11px, 1.3vw, 13px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.track__input::placeholder {
+  font-family: 'Onest', sans-serif;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.track__row .btn { flex: 0 0 auto; }
+
+/* карточка результата — вырванный листок поверх страницы */
+.track__card {
+  margin-top: clamp(18px, 2.6vh, 26px);
+  padding-top: clamp(16px, 2.4vh, 22px);
+  border-top: 2px dashed var(--grid-bold);
+}
+.track__code {
+  margin: 0 0 0.7em;
+  font-size: clamp(13px, 1.6vw, 17px);
+  color: var(--ink);
+  background: var(--yellow);
+  padding: 0.3em 0.5em;
+  border-radius: 8px;
+  display: inline-block;
+  letter-spacing: 0.06em;
+}
+.track__card .status { margin-left: 8px; vertical-align: 2px; }
+.track__date {
+  margin: 0.8em 0 0;
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+.track__more { margin: clamp(14px, 2vh, 20px) 0 0; font-size: 15px; }
+
+/* ---- ответ партии: цитата ---- */
+.reply {
+  margin: clamp(18px, 2.6vh, 26px) 0 0;
+  padding: clamp(16px, 2.2vw, 22px);
+  position: relative;
+  background: var(--paper-deep);
+  border-radius: 16px;
+  transform: rotate(-0.4deg);
+}
+/* Цитату отбивает не полоса сбоку, а сама кавычка: крупная,
+   синей пастой, вынесена на поля — как в книге. */
+.reply__text {
+  text-indent: -0.42em;
+}
+.reply__text::before {
+  color: var(--blue);
+  font-weight: 700;
+}
+.reply__text {
+  margin: 0;
+  font-size: clamp(17px, 1.9vw, 21px);
+  line-height: 1.5;
+  color: var(--ink);
+  quotes: "«" "»";
+}
+.reply__text::before { content: open-quote; }
+.reply__text::after  { content: close-quote; }
+
+.reply__from {
+  margin-top: 0.85em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+.reply__from img { image-rendering: pixelated; flex-shrink: 0; }
+.reply__from b { color: var(--ink); }
+
+/* ---- путь заявки ---- */
+.steps {
+  list-style: none;
+  margin: clamp(18px, 2.6vh, 26px) 0 0;
+  padding: 0 0 0 4px;
+}
+.steps__i {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 0 0.9em 22px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+/* линия, соединяющая шаги */
+.steps__i::before {
+  content: "";
+  position: absolute;
+  left: 5px; top: 1.05em; bottom: -0.1em;
+  width: 2px;
+  background: var(--grid-bold);
+}
+.steps__i--last::before { display: none; }
+.steps__i--last { padding-bottom: 0; }
+
+.steps__dot {
+  position: absolute;
+  left: 0; top: 0.45em;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--grid-bold);
+  background: var(--paper);
+}
+.steps__i--last .steps__dot {
+  border-color: var(--blue);
+  background: var(--blue);
+}
+.steps__label { color: var(--ink); font-weight: 500; }
+.steps__date { color: var(--ink-faint); font-size: 13px; margin-left: auto; }
+
+@media (max-width: 520px) {
+  .track__row .btn { width: 100%; }
+  .steps__date { margin-left: 0; width: 100%; }
+  .steps__i { flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reply { transform: none; }
+}
+
+/* ============================================================
+   Секция идей: три карточки в ряд душат текст.
+   Форма отправки и проверка статуса — одна пара (это один
+   сценарий: отправил → проверил). Анонимная поддержка стоит
+   отдельно: у неё другой разговор.
+   ============================================================ */
+@media (min-width: 900px) {
+  #idea .grid2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  /* блок поддержки занимает всю ширину под ними */
+  #idea .grid2 > .note:last-child {
+    grid-column: 1 / -1;
+  }
+  /* в широком блоке текст не должен растягиваться на всю строку */
+  #idea .grid2 > .note:last-child p { max-width: 62ch; }
+  #idea .grid2 > .note:last-child .btn { margin-top: 4px; }
+}

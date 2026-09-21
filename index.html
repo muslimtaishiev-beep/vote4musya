@@ -515,6 +515,25 @@
       <p role="status" id="ideaMsg" class="form-msg"></p>
     </form>
 
+    <div class="note rise" style="--d:190ms" id="trackBox">
+      <h3>Что с твоим предложением</h3>
+      <p>После отправки остаётся код. Введи его — покажу, на каком этапе
+        предложение и что ответила партия.</p>
+
+      <form id="trackForm" novalidate>
+        <label class="hand field-label" for="trackCode">код заявки</label>
+        <div class="track__row">
+          <input class="field track__input" id="trackCode" name="code" type="text"
+                 inputmode="latin" autocomplete="off" spellcheck="false"
+                 placeholder="например EWJQECCBK5" maxlength="16">
+          <button class="btn" type="submit" id="trackBtn">Проверить</button>
+        </div>
+        <p role="status" id="trackMsg" class="form-msg"></p>
+      </form>
+
+      <div id="trackResult" hidden></div>
+    </div>
+
     <div class="note rise" style="--d:190ms">
       <h3>Если тяжело, напиши анонимно</h3>
       <p>
