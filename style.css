@@ -1522,3 +1522,18 @@ input[type="file"].field {
 @media (prefers-reduced-motion: reduce) {
   .wall__card { transition: none; }
 }
+
+/* мостик из блока идей к витрине ниже */
+.track__hint {
+  margin: clamp(16px, 2.2vh, 22px) 0 0;
+  font-size: clamp(19px, 2.1vw, 24px);
+}
+.track__hint a {
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 2px solid rgba(27,63,216,.35);
+  transition: border-color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .track__hint a:hover { border-bottom-color: var(--blue); }
+}
