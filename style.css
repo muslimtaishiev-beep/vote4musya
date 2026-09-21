@@ -1,0 +1,1255 @@
+@import url("fonts.css");
+
+/* ============================================================
+   МУСЯ — ПРЕЗИДЕНТ ШКОЛЫ
+   Мир: поля школьной тетради. Клетка, три пасты, пиксель-арт.
+   ============================================================ */
+
+:root {
+  /* — бумага — */
+  --paper:      #FAF7EE;
+  --paper-deep: #F3EEE0;
+  --grid:       #C3D4E8;
+  --grid-bold:  #A9C1DE;
+  --margin-red: #E9B4AE;
+
+  /* — пасты — */
+  --ink:        #1B1F2A;
+  --ink-soft:   #545C6E;
+  --ink-faint:  #646D80;
+  --blue:       #1B3FD8;
+  --blue-deep:  #1330A8;
+  --red:        #E32B1E;
+  --red-deep:   #C21E12;
+  --green:      #0E6F3C;
+  --yellow:     #F5C21B;
+  --pink:       #E86A92;
+
+  /* — сетка — */
+  --cell: 26px;
+  --page: 1180px;
+  --gutter: clamp(18px, 5vw, 64px);
+
+  /* — кривые (Emil Kowalski) — */
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-soft:   cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  font-family: 'Onest', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(16px, 1.05vw + 13px, 19px);
+  line-height: 1.62;
+  color: var(--ink);
+  background-color: var(--paper);
+  /* Настоящая тетрадная клетка — поверхность из мира предмета. */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell), var(--cell) var(--cell);
+  overflow-x: hidden;
+}
+
+/* поля тетради — красная вертикаль слева, как в настоящей */
+body::before {
+  content: "";
+  position: fixed;
+  inset-block: 0;
+  left: clamp(14px, 4.2vw, 74px);
+  width: 2px;
+  background: var(--margin-red);
+  opacity: .8;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (max-width: 720px) {
+  body::before { left: 12px; opacity: .7; }
+  .wrap { padding-left: max(var(--gutter), 30px); }
+}
+
+/* — поверхности браузера тоже наши — */
+::selection { background: var(--yellow); color: var(--ink); }
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+html { scrollbar-color: var(--blue) var(--paper-deep); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--paper-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--blue); border-radius: 99px;
+  border: 3px solid var(--paper-deep);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--blue-deep); }
+
+/* ============================ типографика ============================ */
+
+h1, h2, h3 {
+  font-family: 'Unbounded', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  margin: 0;
+  text-wrap: balance;
+}
+p { margin: 0 0 1em; max-width: 68ch; }
+a { color: var(--blue); text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+.hand {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+.pix {
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.7;
+}
+
+/* ============================ каркас ============================ */
+
+.wrap {
+  position: relative;
+  z-index: 2;
+  max-width: var(--page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+section { position: relative; }
+
+/* ============================ ГЕРОЙ ============================ */
+
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(80px, 14vh, 150px) clamp(40px, 8vh, 90px);
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+  gap: clamp(20px, 4vw, 56px);
+  align-items: center;
+}
+@media (max-width: 900px) { .hero__grid { grid-template-columns: 1fr; } }
+
+/* правая колонка — стопка записок на полях */
+.hero__side {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .hero__side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: clamp(20px, 4vh, 32px);
+  }
+  .hero__side .chip { margin-left: 0 !important; font-size: 13px; padding: 0.5em 0.75em; }
+  .hero__side .chip .pix { font-size: 11px; }
+}
+
+.chip {
+  position: relative;
+  align-self: flex-start;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  padding: 0.66em 1em;
+  font-weight: 600;
+  font-size: clamp(14px, 1.35vw, 17px);
+  line-height: 1.3;
+  box-shadow: 0 2px 0 var(--grid-bold);
+  transform: rotate(var(--rot, 0deg));
+}
+.chip .pix { font-size: 11px; color: var(--ink-faint); display: block; margin-bottom: 4px; letter-spacing: .06em; }
+.chip img { image-rendering: pixelated; vertical-align: -3px; margin-right: 6px; }
+.chip--green { border-color: var(--green); color: var(--green); box-shadow: 0 2px 0 rgba(18,138,75,.3); }
+
+/* имя + рукописная правка сверху */
+.hero__col { container-type: inline-size; min-width: 0; }
+
+.hero__name {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(50px, 19cqw, 168px);
+  line-height: 0.86;
+  max-width: 100%;
+}
+.hero__fix {
+  position: absolute;
+  left: 6%;
+  bottom: calc(100% + 0.16em);
+  font-size: clamp(34px, 8vw, 104px);
+  color: var(--red);
+  transform: rotate(-5deg);
+  white-space: nowrap;
+  line-height: 1;
+}
+.hero__caret {
+  position: absolute;
+  left: 12%;
+  bottom: calc(100% - 0.16em);
+  width: clamp(20px, 4vw, 46px);
+  color: var(--red);
+  overflow: visible;
+}
+/* имени нужно место сверху под правку */
+.hero__name { margin-top: clamp(52px, 11vw, 132px); }
+
+/* красный круг, который обводит имя */
+.hero__circle {
+  position: absolute;
+  inset: -15% -5% -8% -5%;
+  width: auto; height: auto;
+  overflow: visible;
+  pointer-events: none;
+  z-index: -1;
+}
+.hero__circle path {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  opacity: .92;
+}
+
+.hero__line {
+  font-size: clamp(19px, 2.2vw, 27px);
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 21ch;
+  margin-top: clamp(28px, 5vh, 54px);
+  font-weight: 500;
+}
+.hero__line b {
+  font-weight: 700;
+  background: linear-gradient(var(--yellow), var(--yellow)) 0 88% / 100% 0.46em no-repeat;
+  padding-inline: 0.12em;
+}
+
+.hero__foot {
+  margin-top: clamp(34px, 6vh, 64px);
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3vw, 34px);
+  flex-wrap: wrap;
+}
+
+/* ============================ кнопки ============================ */
+
+.btn {
+  --btn-bg: var(--blue);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.95em 1.6em;
+  border: none;
+  border-radius: 16px;
+  background: var(--btn-bg);
+  color: #fff;
+  font-family: 'Unbounded', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(15px, 1.5vw, 19px);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(19,48,168,.55), 0 10px 22px -10px rgba(19,48,168,.7);
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { background: var(--blue-deep); transform: translateY(-1px); }
+}
+.btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 0 rgba(19,48,168,.55), 0 4px 10px -6px rgba(19,48,168,.7);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn--ghost:hover { background: var(--ink); color: var(--paper); transform: translateY(-1px); }
+}
+.btn--ghost:active { transform: scale(0.97); box-shadow: none; }
+.btn__sprite { width: 1.5em; height: 1.5em; image-rendering: pixelated; }
+
+/* стрелка, нарисованная к кнопке */
+.arrow-to {
+  width: clamp(54px, 9vw, 104px);
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+@media (max-width: 620px) { .arrow-to { display: none; } }
+
+/* ============================ маргиналии ============================ */
+/* Спрайты и пометки на полях. Каждый повёрнут на свой угол — */
+/* ничего не выровнено по сетке, в этом и смысл.               */
+
+.doodle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: 3;
+}
+.doodle img { display: block; image-rendering: pixelated; }
+.doodle .hand { color: var(--ink-faint); font-size: clamp(15px, 1.9vw, 21px); }
+
+/* ============================ ПРОГРАММА ============================ */
+
+.plank {
+  position: relative;
+  padding: clamp(24px, 3.4vw, 40px) 0;
+  border-bottom: 2px solid var(--grid-bold);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) max-content;
+  gap: clamp(16px, 2.2vw, 28px);
+  align-items: start;
+}
+.plank:last-child { border-bottom: none; }
+
+.plank__sprite {
+  width: clamp(46px, 5.6vw, 72px);
+  height: clamp(46px, 5.6vw, 72px);
+  image-rendering: pixelated;
+  margin-top: 0.15em;
+}
+.plank__title {
+  font-size: clamp(24px, 3.5vw, 44px);
+  margin-bottom: 0.36em;
+}
+.plank__body { color: var(--ink-soft); margin: 0; max-width: 56ch; }
+.plank__num {
+  font-size: clamp(9px, 1.1vw, 11px);
+  color: var(--ink-faint);
+}
+
+/* статус — рисуется формой, а не цветом (донор: патч-панель) */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: 'Onest', sans-serif;
+  font-size: clamp(12px, 1.3vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.42em 0.85em;
+  border-radius: 99px;
+}
+.status svg { width: 1.5em; height: 1.5em; flex-shrink: 0; }
+/* идёт сейчас: сплошная рамка + закрашенный маркер */
+.status--now {
+  color: var(--green);
+  border: 2px solid var(--green);
+  background: rgba(18,138,75,.07);
+}
+/* план: пунктирная рамка + пустой маркер */
+.status--plan {
+  color: var(--ink-soft);
+  border: 2px dashed var(--ink-faint);
+  background: transparent;
+}
+
+/* ============================ блоки ============================ */
+
+.band {
+  padding-block: clamp(70px, 11vh, 132px);
+}
+.band__head {
+  font-size: clamp(32px, 6.2vw, 78px);
+  margin-bottom: clamp(28px, 4.5vh, 54px);
+  max-width: 17ch;
+}
+.band__intro {
+  font-size: clamp(17px, 1.7vw, 21px);
+  color: var(--ink-soft);
+  max-width: 54ch;
+  margin-bottom: clamp(30px, 5vh, 60px);
+}
+
+/* — вырванный листок: форма для записки — */
+.note {
+  position: relative;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  padding: clamp(24px, 3.4vw, 40px);
+  box-shadow: 0 3px 0 var(--grid-bold), 0 18px 34px -22px rgba(27,31,42,.5);
+}
+.note h3 { font-size: clamp(21px, 2.6vw, 30px); margin-bottom: 0.5em; }
+.note p  { color: var(--ink-soft); }
+
+.field {
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper-deep);
+  border: 2px solid var(--grid-bold);
+  border-radius: 12px;
+  padding: 0.8em 0.95em;
+  resize: vertical;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.field::placeholder { color: var(--ink-faint); }
+.field:hover { border-color: var(--ink-faint); }
+/* Клавиатурный фокус обязан быть видимым: одной смены цвета рамки мало. */
+.field:focus {
+  border-color: var(--blue);
+  background: var(--paper);
+}
+.field:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(18px, 2.6vw, 32px);
+}
+
+/* ============================ финал ============================ */
+
+.close {
+  text-align: center;
+  padding-block: clamp(90px, 15vh, 170px);
+}
+.close__head {
+  font-size: clamp(38px, 9vw, 122px);
+  margin-bottom: 0.4em;
+}
+.close .hero__circle { inset: -9% -4% -7% -4%; }
+
+footer {
+  border-top: 2px solid var(--grid-bold);
+  padding-block: clamp(28px, 4vh, 44px);
+  color: var(--ink-faint);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* ============================ ДВИЖЕНИЕ ============================ */
+/* Одна авторская идея: страница пишется. Всё появляется так,   */
+/* будто кто-то только что это записал — снизу, чуть смазанно.  */
+
+.rise {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(3px);
+  transition:
+    opacity 620ms var(--ease-out),
+    transform 620ms var(--ease-out),
+    filter 620ms var(--ease-out);
+  transition-delay: var(--d, 0ms);
+}
+.rise.is-in {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* круг обводится один раз, когда доходит до него взгляд */
+.draw {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: var(--len, 1200);
+}
+.draw.is-in {
+  transition: stroke-dashoffset 900ms var(--ease-in-out) 220ms;
+  stroke-dashoffset: 0;
+}
+
+/* спрайты на полях чуть дышат — по своей фазе, без синхрона */
+@media (prefers-reduced-motion: no-preference) {
+  .bob { animation: bob 5.5s var(--ease-in-out) infinite; animation-delay: var(--phase, 0s); }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+    50%      { transform: translateY(-7px) rotate(var(--rot, 0deg)); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise { opacity: 1; transform: none; filter: none; transition: none; }
+  .draw { stroke-dasharray: none; stroke-dashoffset: 0; transition: none; }
+  .bob  { animation: none; }
+  .btn  { transition: background-color 160ms ease; }
+}
+
+
+/* ============ обводка слова ============ */
+.ring {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.ring > svg {
+  position: absolute;
+  inset: -6% -8% -12% -8%;
+  width: auto; height: auto;
+  overflow: visible;
+  pointer-events: none;
+  z-index: -1;
+}
+.ring > svg path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: .85;
+}
+.ring--red > svg path { stroke: var(--red); }
+
+/* ============ подчёркивание с перелётом ============ */
+.ul { position: relative; display: inline-block; }
+.ul > svg {
+  position: absolute;
+  left: -3%; right: -5%;
+  top: calc(100% - 0.12em);
+  width: 108%;
+  overflow: visible;
+  pointer-events: none;
+}
+.ul > svg path {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+
+/* На узких экранах пометки не исчезают — они становятся мельче и
+   уходят к самому краю, ровно как в настоящей тетради. */
+@media (max-width: 1100px) {
+  .plank .doodle { font-size: 15px; max-width: 8ch; line-height: 1.15; }
+  .plank .doodle.hand { right: auto; left: -4px; top: auto; bottom: 6px; }
+}
+@media (max-width: 760px) {
+  .hero__name { margin-top: clamp(44px, 16vw, 90px); }
+  .doodle img { width: 26px; height: 26px; }
+  .plank .doodle.hand { font-size: 14px; opacity: .9; }
+}
+/* только самые тесные экраны теряют текстовые пометки на планках,
+   спрайты остаются всегда */
+@media (max-width: 460px) {
+  .plank .doodle.hand { display: none; }
+}
+
+/* на узких экранах планка становится столбиком */
+@media (max-width: 720px) {
+  .plank {
+    grid-template-columns: auto 1fr;
+    row-gap: 14px;
+  }
+  .plank > .status { grid-column: 1 / -1; justify-self: start; }
+}
+
+/* подпись живёт только рядом со своей стрелкой */
+@media (max-width: 620px) {
+  .hint { display: none; }
+}
+
+/* на телефоне герой не должен зиять пустотой сверху */
+@media (max-width: 760px) {
+  .hero { min-height: auto; padding-block: clamp(56px, 14vh, 96px) clamp(48px, 9vh, 80px); }
+}
+
+/* ============================================================
+   ЛИСТ
+   Страница — не бесконечная плоскость, а сшитая тетрадь:
+   у неё есть край, и под ним виден следующий лист.
+   ============================================================ */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+/* правый край листа: бумага кончается, за ней тень и следующий лист */
+.sheet::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: clamp(10px, 2.4vw, 30px);
+  background:
+    linear-gradient(90deg, rgba(27,31,42,.10), rgba(27,31,42,0) 42%),
+    var(--paper-deep);
+  border-left: 1px solid rgba(27,31,42,.14);
+}
+@media (max-width: 720px) { .sheet::after { width: 8px; } }
+
+/* ============================================================
+   ЧЕРНИЛА
+   Паста не идёт ровной линией: она то жирнее, то тоньше,
+   и копится на повороте петли.
+   ============================================================ */
+
+/* второй, более бледный проход поверх первого — перо прошло дважды */
+.hero__circle path.ink2 {
+  stroke-width: 1.8;
+  opacity: .42;
+  transform: translate(1.5px, 2px) rotate(.35deg);
+  transform-origin: center;
+}
+.ring > svg path.ink2 {
+  stroke-width: 2;
+  opacity: .38;
+  transform: translate(-1px, 1.5px);
+  transform-origin: center;
+}
+/* нажим: линия толще в начале петли и тоньше к концу */
+.hero__circle path { stroke-linejoin: round; }
+
+/* ============================================================
+   ДВИЖЕНИЕ ПО РОЛЯМ
+   Не один и тот же выезд на каждом блоке: у героя, списка
+   и финала — своя манера.
+   ============================================================ */
+
+/* список программы: строки «дописываются» слева, со сдвигом по очереди */
+.plank.rise {
+  transform: translateY(10px) translateX(-6px);
+}
+.plank.rise.is-in { transform: none; }
+
+/* финальный блок приходит масштабом, а не сдвигом: страница закрывается */
+.close .rise { transform: scale(0.985); filter: blur(4px); }
+.close .rise.is-in { transform: none; filter: blur(0); }
+
+/* записки чуть разворачиваются на место */
+.note.rise { transform: translateY(16px) rotate(-0.5deg); }
+.note.rise.is-in { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .plank.rise, .close .rise, .note.rise { transform: none; filter: none; }
+}
+
+/* ============ переход: вопрос на полях и ответ ============ */
+.turn {
+  position: relative;
+  padding-block: clamp(56px, 10vh, 110px);
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-areas:
+    "q arrow"
+    "a a";
+  gap: clamp(14px, 2.4vw, 30px) clamp(16px, 3vw, 40px);
+  align-items: center;
+}
+.turn__q {
+  grid-area: q;
+  font-size: clamp(26px, 4.4vw, 52px);
+  color: var(--red-deep);
+  transform: rotate(-3deg);
+  margin: 0;
+}
+.turn__arrow {
+  grid-area: arrow;
+  width: clamp(120px, 20vw, 230px);
+  color: var(--ink-faint);
+  justify-self: start;
+}
+.turn__a {
+  grid-area: a;
+  font-size: clamp(17px, 1.9vw, 23px);
+  max-width: 54ch;
+  color: var(--ink);
+  margin: 0;
+  padding-left: clamp(0px, 4vw, 70px);
+}
+@media (max-width: 680px) {
+  .turn { grid-template-columns: 1fr; grid-template-areas: "q" "arrow" "a"; }
+  .turn__arrow { width: 130px; }
+  .turn__a { padding-left: 0; }
+}
+
+/* ============ сводка: зелёная паста выходит из плашек ============ */
+.tally {
+  position: relative;
+  padding-block: clamp(50px, 9vh, 100px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.4vh, 26px);
+}
+.tally__row {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 28px);
+  margin: 0;
+  max-width: 58ch;
+}
+.tally__n {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-size: clamp(42px, 8vw, 96px);
+  line-height: 0.8;
+  color: var(--green);
+  flex-shrink: 0;
+  min-width: 1.1em;
+  text-align: right;
+}
+.tally__row:last-child .tally__n { color: var(--ink-faint); }
+.tally__t {
+  font-size: clamp(16px, 1.8vw, 21px);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.tally__t strong.ok {
+  color: var(--green);
+  font-weight: 700;
+  position: relative;
+}
+.tally__t strong.ok::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: var(--green);
+}
+.tally__t em { font-style: normal; color: var(--ink); font-weight: 600; }
+
+/* ============================================================
+   КТО Я  +  ПАРТИЯ 67
+   ============================================================ */
+
+.who__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+@media (max-width: 860px) { .who__grid { grid-template-columns: 1fr; } }
+
+.who__lead {
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.5;
+  max-width: 44ch;
+}
+
+/* факты — строки тетради, а не карточки */
+.facts { list-style: none; margin: clamp(20px,3vh,32px) 0 0; padding: 0; }
+.facts__i {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(10px, 1.6vw, 18px);
+  padding: 0.62em 0;
+  border-bottom: 2px solid var(--grid-bold);
+  font-size: clamp(16px, 1.7vw, 20px);
+  font-weight: 500;
+}
+.facts__i:last-child { border-bottom: none; }
+.facts__k {
+  font-size: 11px;
+  color: var(--ink-faint);
+  min-width: 11ch;
+  flex-shrink: 0;
+  letter-spacing: .04em;
+}
+
+/* место, куда Муся впишет себя — видно, что это слот */
+.who__slot {
+  margin-top: clamp(18px, 3vh, 28px);
+  font-size: clamp(18px, 2.1vw, 24px);
+  color: var(--red-deep);
+  border: 2px dashed var(--margin-red);
+  border-radius: 14px;
+  padding: 0.7em 0.9em;
+  display: inline-block;
+  transform: rotate(-1deg);
+}
+
+/* партия: номер во всю карточку */
+.party {
+  position: relative;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  padding: clamp(26px, 3.4vw, 38px) clamp(24px, 3vw, 34px) clamp(28px, 3.6vw, 40px);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 3px 0 var(--grid-bold), 0 20px 40px -26px rgba(27,31,42,.6);
+}
+.party__k { font-size: 11px; color: var(--yellow); margin: 0 0 0.2em; letter-spacing: .08em; }
+.party__n {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-size: clamp(78px, 13vw, 150px);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  margin: 0 0 0.16em;
+  color: var(--yellow);
+}
+.party__t { margin: 0; color: #CBD2E0; font-size: clamp(15px, 1.55vw, 18px); max-width: 32ch; }
+
+/* ссылка на партию в герое */
+.p67 {
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+  background: var(--yellow);
+  padding: 0 0.28em;
+  border-radius: 6px;
+  transition: transform 160ms var(--ease-out);
+  display: inline-block;
+}
+@media (hover: hover) and (pointer: fine) {
+  .p67:hover { transform: translateY(-1px) rotate(-2deg); }
+}
+.p67:active { transform: scale(0.97); }
+
+/* ============ статус «добиваюсь» ============
+   Третье состояние между «идёт» и «план»: обещана не победа,
+   а усилие. Пунктирный круг внутри сплошной рамки. */
+.status--try {
+  color: var(--red-deep);
+  border: 2px solid var(--red-deep);
+  background: rgba(227,43,30,.06);
+}
+
+/* ============================================================
+   КОМАНДА — партия 67
+   Сетка портретов: строгая рамка, живые лица. Премиум держит
+   сетка, угар приносят сами ребята.
+   ============================================================ */
+
+.team__grid {
+  list-style: none;
+  margin: 0 0 clamp(40px, 7vh, 80px);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(14px, 2.2vw, 26px);
+}
+@media (max-width: 1080px) { .team__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px)  { .team__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.team__m { margin: 0; }
+
+.team__ph {
+  margin: 0 0 0.72em;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  background: var(--paper-deep);
+  box-shadow: 0 3px 0 var(--grid-bold);
+  /* каждый портрет висит чуть под своим углом */
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+}
+.team__m:nth-child(1) .team__ph { --tilt: -1.6deg; }
+.team__m:nth-child(2) .team__ph { --tilt:  1.2deg; }
+.team__m:nth-child(3) .team__ph { --tilt: -0.8deg; }
+.team__m:nth-child(4) .team__ph { --tilt:  1.7deg; }
+.team__m:nth-child(5) .team__ph { --tilt: -1.3deg; }
+.team__m:nth-child(6) .team__ph { --tilt:  0.9deg; }
+
+@media (hover: hover) and (pointer: fine) {
+  .team__ph:hover {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: 0 5px 0 var(--grid-bold), 0 18px 30px -18px rgba(27,31,42,.5);
+  }
+}
+
+.team__ph img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* кандидат выделен пастой, а не размером */
+.team__ph--lead { border-color: var(--blue); box-shadow: 0 3px 0 rgba(27,63,216,.35); }
+
+.team__n {
+  margin: 0;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 1.6vw, 19px);
+  letter-spacing: -0.02em;
+}
+/* незаполненное имя честно выглядит незаполненным */
+.team__n--slot {
+  color: var(--ink-faint);
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: clamp(19px, 2vw, 24px);
+  border-bottom: 2px dashed var(--margin-red);
+  display: inline-block;
+  min-width: 5ch;
+}
+.team__r { margin: 0.1em 0 0; font-size: 13px; color: var(--ink-faint); }
+
+/* ---- постер: доказательство, а не иллюстрация ---- */
+.poster {
+  margin: 0;
+  position: relative;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--paper-deep);
+  box-shadow: 0 3px 0 var(--grid-bold), 0 22px 44px -28px rgba(27,31,42,.55);
+  transform: rotate(-0.6deg);
+}
+.poster img { width: 100%; height: auto; display: block; }
+.poster__c {
+  margin: 0;
+  padding: 0.7em 1em;
+  font-size: clamp(19px, 2.1vw, 25px);
+  color: var(--ink-soft);
+  border-top: 2px solid var(--grid-bold);
+  background: var(--paper);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .team__ph { transition: none; }
+}
+
+/* слот без фото: намеренно пустой, а не сломанный */
+.team__ph.is-empty {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  border-color: var(--margin-red);
+  box-shadow: none;
+}
+.team__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-faint);
+}
+.team__empty img { image-rendering: pixelated; opacity: .55; }
+.team__empty .hand { font-size: 20px; }
+
+/* ============================================================
+   ЖИВЫЕ МОМЕНТЫ
+   Пять мест, где страница отвечает на действие, а не просто
+   показывается. Всё на transform/opacity/clip-path.
+   ============================================================ */
+
+/* --- 1. ГАЛОЧКА В КНОПКЕ ГОЛОСОВАНИЯ ------------------------
+   Назначение: feedback. Нажатие — редкое событие, здесь живёт
+   бюджет на радость. Галочка дочёркивается по clip-path,
+   как ручкой по бумаге.                                      */
+
+.btn__check {
+  width: 1.5em; height: 1.5em;
+  flex-shrink: 0;
+  overflow: visible;
+}
+.btn__check path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 32;
+  stroke-dashoffset: 32;
+}
+.btn.is-marked .btn__check path {
+  transition: stroke-dashoffset 260ms var(--ease-out) 40ms;
+  stroke-dashoffset: 0;
+}
+
+/* --- 2. ПЛАНКА ОТКЛИКАЕТСЯ НА КУРСОР ------------------------
+   Назначение: feedback. Спрайт разворачивается к читателю,
+   строка чуть уезжает вправо — будто палец ведут по списку.  */
+
+.plank__sprite {
+  transition:
+    transform 260ms var(--ease-out),
+    filter 260ms var(--ease-out);
+  will-change: transform;
+}
+.plank__title {
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .plank:hover .plank__sprite {
+    transform: scale(1.14) rotate(-6deg);
+  }
+  .plank:hover .plank__title {
+    transform: translateX(7px);
+  }
+  /* маркер статуса наливается, когда до него дошли */
+  .plank:hover .status--now svg circle { transform: scale(1.18); }
+}
+.status svg circle {
+  transform-origin: center;
+  transition: transform 240ms var(--ease-out);
+}
+
+/* --- 3. ПОДЧЁРКИВАНИЕ ПОД ПУНКТОМ ---------------------------
+   Назначение: spatial consistency. Линия вырастает из левого
+   края строки, а не появляется целиком.                      */
+
+.plank::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  height: 2px;
+  width: 100%;
+  opacity: .85;
+  background: var(--blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 420ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .plank:hover::after { transform: scaleX(1); }
+}
+
+/* --- 4. ИМЯ В ГЕРОЕ РЕАГИРУЕТ НА МЫШЬ ------------------------
+   Назначение: delight, первый экран, видят один раз за визит.
+   Буквы слегка ведёт за курсором — страница чувствует руку.  */
+
+.hero__lean {
+  display: inline-block;
+  transform: rotate(var(--lean, 0deg));
+  transform-origin: 12% 72%;
+  will-change: transform;
+}
+.hero__fix {
+  transition: transform 620ms var(--ease-out);
+}
+.hero__col:hover .hero__fix {
+  transform: rotate(-7deg) translateY(-3px);
+}
+
+/* --- 5. ПОРТРЕТ ПАРТИИ ---------------------------------------
+   Назначение: state indication. Карточка выравнивается,
+   когда на неё смотрят: из кучи — в ряд.                     */
+/* (правила уже есть в .team__ph:hover — здесь только подпись) */
+
+.team__n, .team__r {
+  transition: transform 240ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .team__m:hover .team__n { transform: translateY(-2px); }
+}
+
+/* --- курсор как перо на интерактивном --------------------- */
+.plank { cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .plank__sprite,
+  .plank__title,
+  .plank::after,
+  .hero__lean,
+  .hero__fix,
+  .status svg circle,
+  .team__n, .team__r { transition: none; }
+  .plank::after { display: none; }
+  .btn.is-marked .btn__check path { transition: none; stroke-dashoffset: 0; }
+}
+
+/* линия прочитанного идёт поверх красного поля тетради */
+.readline {
+  position: fixed;
+  top: 0; bottom: 0;
+  left: clamp(14px, 4.2vw, 74px);
+  width: 2px;
+  background: var(--red);
+  transform: scaleY(0);
+  transform-origin: top center;
+  pointer-events: none;
+  z-index: 2;
+}
+@media (max-width: 720px) { .readline { left: 12px; } }
+@media (prefers-reduced-motion: reduce) { .readline { display: none; } }
+
+/* ============================================================
+   ТРИ ВЕЩИ О СЕБЕ
+   Его собственные слова. Не факты списком, а три утверждения,
+   каждое со своим номером на полях.
+   ============================================================ */
+
+.three {
+  list-style: none;
+  margin: clamp(26px, 4vh, 40px) 0 0;
+  padding: 0;
+}
+.three__i {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(12px, 2vw, 20px);
+  padding: clamp(20px, 2.8vh, 28px) 0;
+  border-bottom: 2px solid var(--grid-bold);
+  align-items: start;
+}
+.three__i--last { border-bottom: none; }
+
+.three__n {
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding-top: 0.45em;
+  letter-spacing: .06em;
+}
+.three__t {
+  margin: 0;
+  font-size: clamp(17px, 1.85vw, 22px);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 46ch;
+}
+.three__t strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+/* третий пункт — главный, он про то, ради чего голосуют */
+.three__i--last .three__t { color: var(--ink); }
+.three__i--last .three__t strong {
+  background: linear-gradient(var(--yellow), var(--yellow)) 0 88% / 100% 0.4em no-repeat;
+  padding-inline: 0.1em;
+}
+
+/* приглашение — рукой, как записка */
+.who__call {
+  margin: clamp(22px, 3.4vh, 32px) 0 0;
+  font-size: clamp(21px, 2.4vw, 30px);
+  color: var(--blue);
+  transform: rotate(-1.4deg);
+  display: inline-block;
+}
+.who__call::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: var(--blue);
+  opacity: .5;
+  margin-top: 4px;
+  transform: scaleX(0.94);
+  transform-origin: left;
+}
+
+/* участники партии без подписи-имени */
+.team__r--only {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+/* у кандидата две строки подписи, у остальных одна:
+   сетка выравнивает по верху, чтобы имена стояли в линию */
+.team__m { display: flex; flex-direction: column; }
+.team__ph { margin-bottom: 0.72em; }
+
+/* постер-доказательство отсутствует — подпись о походе по школе
+   несёт эту роль, поэтому блок не должен обрываться пустотой */
+.team__grid { margin-bottom: clamp(28px, 4.5vh, 56px); }
+
+/* ============================================================
+   ФОРМА ПРЕДЛОЖЕНИЙ
+   Поля приходят с сервера, поэтому стили описывают роли,
+   а не конкретные поля: анкету меняет организатор.
+   ============================================================ */
+
+.field-row { margin-bottom: clamp(14px, 2vh, 20px); }
+.field-row:last-of-type { margin-bottom: clamp(18px, 2.6vh, 26px); }
+
+.field-label {
+  display: block;
+  font-size: clamp(18px, 2vw, 22px);
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+/* галочка стоит в строку с подписью */
+.field-row--check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.field-row--check .field-label { margin: 0; }
+.field-check {
+  width: 22px; height: 22px;
+  accent-color: var(--blue);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* список выбора — та же бумага, что и у остальных полей */
+select.field {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: right 1.05em top 55%, right 0.75em top 55%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.4em;
+  cursor: pointer;
+}
+
+input[type="file"].field {
+  padding: 0.6em 0.7em;
+  font-size: 0.92em;
+  cursor: pointer;
+}
+
+.field-loading {
+  font-size: clamp(18px, 2vw, 22px);
+  color: var(--ink-faint);
+  margin: 0 0 1em;
+}
+
+/* сообщение под формой */
+.form-msg {
+  margin: 14px 0 0;
+  min-height: 1.5em;
+  font-weight: 600;
+  color: var(--green);
+}
+.form-msg--warn { color: var(--red-deep); }
+
+/* код принятой заявки */
+.code-row { margin-top: 1em; }
+.code {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(14px, 1.7vw, 19px);
+  color: var(--ink);
+  background: var(--yellow);
+  padding: 0.35em 0.5em;
+  border-radius: 8px;
+  letter-spacing: 0.04em;
+  user-select: all;
+}
+
+/* кнопка в работе */
+.btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
