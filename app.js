@@ -791,3 +791,101 @@
     })
     .catch(function () { /* нет связи — раздел остаётся скрытым */ });
 })();
+
+/* ============================================================
+   КОМАНДА: сколько фото положили, столько и показываем
+   Файлы img/team/member-2.jpg, member-3.jpg и дальше подряд.
+   Никаких правок в разметке — положил файл, он появился.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var grid = document.getElementById('teamGrid');
+  if (!grid) return;
+
+  var MAX = 40;          // предохранитель от бесконечного перебора
+  var STEP_DELAY = 40;   // сдвиг появления между карточками, мс
+
+  /* грузим фото и говорим, получилось ли */
+  function probe(src) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload  = function () { resolve(true); };
+      img.onerror = function () { resolve(false); };
+      img.src = src;
+    });
+  }
+
+  function card(src, index) {
+    var li = document.createElement('li');
+    li.className = 'team__m rise';
+    li.style.setProperty('--d', Math.min(index * STEP_DELAY, 320) + 'ms');
+
+    var fig = document.createElement('figure');
+    fig.className = 'team__ph';
+
+    var img = document.createElement('img');
+    img.src = src;
+    img.alt = '';
+    img.width = 420;
+    img.height = 560;
+    img.loading = 'lazy';
+
+    var role = document.createElement('p');
+    role.className = 'team__r team__r--only';
+    role.textContent = 'партия 67';
+
+    fig.appendChild(img);
+    li.appendChild(fig);
+    li.appendChild(role);
+    return li;
+  }
+
+  /* идём по порядку, пока файлы находятся; один пропуск не
+     обрывает перебор — вдруг номер просто пропущен */
+  (function walk(n, misses, added) {
+    if (n > MAX || misses > 2) return finish(added);
+
+    var src = 'img/team/member-' + n + '.jpg';
+    probe(src).then(function (ok) {
+      if (ok) {
+        grid.appendChild(card(src, added + 1));
+        walk(n + 1, 0, added + 1);
+      } else {
+        walk(n + 1, misses + 1, added);
+      }
+    });
+  })(2, 0, 0);
+
+  function finish(added) {
+    if (!added) return;
+
+    var cards = grid.querySelectorAll('.team__m.rise:not(.is-in)');
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        !('IntersectionObserver' in window)) {
+      cards.forEach(function (el) { el.classList.add('is-in'); });
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -4% 0px' });
+
+    cards.forEach(function (el) { io.observe(el); });
+
+    /* страховка: если раздел отрисовался уже внутри экрана,
+       наблюдатель не сработает, а карточка не должна остаться
+       полупрозрачной навсегда */
+    setTimeout(function () {
+      cards.forEach(function (el) {
+        if (!el.classList.contains('is-in')) {
+          el.classList.add('is-in');
+          io.unobserve(el);
+        }
+      });
+    }, 1500);
+  }
+})();
