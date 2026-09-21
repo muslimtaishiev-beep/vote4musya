@@ -758,18 +758,36 @@
         : 'Это то, что написали ученики. Ответы появятся здесь же, как только разберём.';
       section.hidden = false;
 
-      /* блоки появляются по прокрутке, как и всё остальное */
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
-          'IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) {
-            if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-          });
-        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-        grid.querySelectorAll('.rise').forEach(function (el) { io.observe(el); });
-      } else {
-        grid.querySelectorAll('.rise').forEach(function (el) { el.classList.add('is-in'); });
+      /* Карточки появляются по прокрутке. Порог держим низким и
+         страхуемся таймером: раздел мог отрисоваться уже внутри
+         экрана, и тогда наблюдатель не сработает — карточка
+         останется полупрозрачной навсегда. */
+      var cards = grid.querySelectorAll('.rise');
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+          !('IntersectionObserver' in window)) {
+        cards.forEach(function (el) { el.classList.add('is-in'); });
+        return;
       }
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -4% 0px' });
+
+      cards.forEach(function (el) { io.observe(el); });
+
+      /* если через полторы секунды что-то всё ещё невидимо —
+         показываем принудительно: контент важнее анимации */
+      setTimeout(function () {
+        cards.forEach(function (el) {
+          if (!el.classList.contains('is-in')) {
+            el.classList.add('is-in');
+            io.unobserve(el);
+          }
+        });
+      }, 1500);
     })
     .catch(function () { /* нет связи — раздел остаётся скрытым */ });
 })();
