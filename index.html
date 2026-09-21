@@ -9,11 +9,11 @@
 <meta property="og:title" content="Муся — президент школы">
 <meta property="og:description" content="Не обещаю. Уже делаю. 15 пунктов, у каждого честный статус. Партия 67.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="">
-<!-- ВАЖНО: после покупки домена замени на абсолютный адрес,
-     например https://vote4musya.kg/img/og.jpg — иначе превью
-     в Telegram и WhatsApp не покажется. Там же og:url. -->
-<meta property="og:image" content="img/og.jpg">
+<!-- Абсолютные адреса: боты Telegram и WhatsApp не выполняют JS,
+     относительный путь они не принимают. При переезде на свой домен
+     поменяй эти две строки (скрипт ниже подстрахует браузеры). -->
+<meta property="og:url" content="https://vote4musya.vercel.app/">
+<meta property="og:image" content="https://vote4musya.vercel.app/img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="ru_RU">
@@ -21,6 +21,23 @@
 <link rel="icon" href="img/sprite-musya.png">
 <link rel="preload" as="font" type="font/woff2" href="fonts/unbounded-800-cyrillic.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="fonts/onest-400-cyrillic.woff2" crossorigin>
+<script>
+/* Абсолютные адреса для превью в Telegram, WhatsApp и соцсетях.
+   Относительный путь они не принимают, а домен заранее неизвестен —
+   поэтому берём его из самой страницы. */
+(function () {
+  var base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  var set = function (prop, value) {
+    var el = document.querySelector('meta[property="' + prop + '"]');
+    if (el) el.setAttribute('content', value);
+  };
+  // адреса уже прописаны в HTML; переписываем, только если домен другой
+  if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    set('og:url', base);
+    set('og:image', base + 'img/og.jpg');
+  }
+})();
+</script>
 <link rel="stylesheet" href="style.css">
 <style>.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}</style>
 </head>
