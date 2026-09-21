@@ -55,16 +55,19 @@ Already running during the campaign period:
 1. **Voice of students** — surveys, an idea box, an open backlog of what students ask for.
 2. **Complaints resolved immediately** — a fast, tracked route instead of problems disappearing.
 3. **Anonymous mental-health support** — a confidential channel.
-4. **Career guidance** — a week with visiting professionals giving trainings.
+
+Secured but not yet delivered — the "добиваюсь" status, where effort is promised and reported, not an outcome:
+
+4. **Days without uniform, and themed days** — the administration has already approved these; only the dates remain. This is the campaign's one concrete win to date and the proof that the method works.
+5. **DECA** — an attempt to bring DECA to Central Asia for the first time, stated by the candidate as an attempt.
+6. **A single portal of global opportunities** — prestigious ones only, explicitly not pay-to-play. Also an attempt.
 
 Planned:
 
-5. **Two weeks, one profession** — a sustained format rather than a single talk.
-6. **TEDx** — bringing a TEDx event to the school.
-7. **DECA** — an attempt to bring DECA to Central Asia for the first time. Stated by the candidate as an attempt ("постараюсь"), and the site must keep that honesty; it is not a promise of success.
-8. **A single portal of global opportunities** — prestigious ones only, explicitly not pay-to-play and not low-quality chance-based listings. Also stated as an attempt.
-9. **School radio and news.**
-10. **Days without uniform.**
+7. **Career guidance week** — visiting professionals running real trainings. NOT yet running: the candidate corrected this, it is planned.
+8. **Two weeks, one profession** — a sustained format rather than a single talk.
+9. **TEDx** — bringing a TEDx event to the school.
+10. **School radio and news.**
 11. **Business incubator / startup fair** — students build mini-projects (merch, handmade, services) and pitch them; winners receive budget from the school fund.
 12. **Podcast studio / media centre** — a school podcast where seniors discuss trends, interview teachers, and talk about teenage problems.
 13. **Secret angel (professional)** — a month in which school alumni, now university students, anonymously correspond with seniors, helping them choose a university and sharing practical advice.

@@ -1253,3 +1253,10 @@ input[type="file"].field {
   cursor: not-allowed;
   transform: none;
 }
+
+/* плашка героя для статуса «добиваюсь» */
+.chip--try {
+  border-color: var(--red-deep);
+  color: var(--red-deep);
+  box-shadow: 0 2px 0 rgba(194,30,18,.28);
+}
