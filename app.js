@@ -612,3 +612,159 @@
       });
   });
 })();
+
+/* ============================================================
+   ВИТРИНА ПРЕДЛОЖЕНИЙ И СЧЁТЧИК
+   Сервер отдаёт только заявки, отмеченные в кабинете кнопкой
+   «На сайт», и вырезает персональные поля. Если не отмечено
+   ничего — раздел не показывается вовсе.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var API  = 'https://www.studyfreeforum.com';
+  var FORM = 'form_1789541783872';
+
+  /* --- счётчик: сколько предложений реально пришло --- */
+  var row   = document.getElementById('statsRow');
+  var num   = document.getElementById('statsTotal');
+  var text  = document.getElementById('statsText');
+
+  /* «1 предложение», «2 предложения», «5 предложений» */
+  function plural(n, one, few, many) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return many;
+    if (b > 1 && b < 5)   return few;
+    if (b === 1)          return one;
+    return many;
+  }
+
+  if (row && num && text) {
+    fetch(API + '/api/forms/public/' + FORM + '/stats')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.success || !j.total) return;   // нечего показывать
+        num.textContent = j.total;
+        var word = plural(j.total, 'предложение', 'предложения', 'предложений');
+        text.textContent = word + ' уже пришло от учеников' +
+          (j.resolved ? ', ' + j.resolved + ' из них решены' : '');
+        row.hidden = false;
+      })
+      .catch(function () { /* нет связи — просто не показываем */ });
+  }
+
+  /* --- витрина: что предложили и что ответили --- */
+  var section = document.getElementById('predlozheniya');
+  var grid    = document.getElementById('wallGrid');
+  var lead    = document.getElementById('wallLead');
+  if (!section || !grid || !lead) return;
+
+  function when(t) {
+    if (!t) return '';
+    var ms = typeof t === 'object' && t._seconds ? t._seconds * 1000 : Date.parse(t);
+    if (!ms || isNaN(ms)) return '';
+    try {
+      return new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+    } catch (e) { return ''; }
+  }
+
+  function esc(t) {
+    return String(t == null ? '' : t)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* статус рисуем формой, как у пунктов программы */
+  function shape(status) {
+    if (/approved|accepted|done|complete|resolved|paid|checked/i.test(status)) return 'now';
+    if (/progress|review|work|pending/i.test(status))                          return 'try';
+    return 'plan';
+  }
+
+  fetch(API + '/api/forms/public/' + FORM + '/submissions')
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j || !j.success) return;
+      var list = Array.isArray(j.submissions) ? j.submissions : [];
+      if (!list.length) return;            // не отмечено ничего — раздел не нужен
+
+      var labels = j.fieldLabels || {};
+      var withReply = 0;
+
+      var html = list.map(function (sub, i) {
+        /* текст заявки: склеиваем оставшиеся поля */
+        var data = sub.data || {};
+        var body = Object.keys(data).map(function (k) {
+          var v = data[k];
+          if (v === true)  v = 'да';
+          if (v === false) return '';
+          v = String(v == null ? '' : v).trim();
+          if (!v) return '';
+          /* когда поле одно, подпись не нужна — текст говорит сам за себя */
+          var many = Object.keys(data).length > 1;
+          return many && labels[k]
+            ? '<p class="wall__field"><span class="wall__key">' + esc(labels[k]) +
+              '</span> ' + esc(v) + '</p>'
+            : '<p class="wall__text">' + esc(v) + '</p>';
+        }).join('');
+
+        if (!body) return '';
+
+        var kind = shape(sub.status || '');
+        var mark = kind === 'now'
+          ? '<circle cx="12" cy="12" r="7" fill="currentColor"/>'
+          : kind === 'try'
+            ? '<circle cx="12" cy="12" r="6.6" stroke="currentColor" stroke-width="2.6" stroke-dasharray="3 3"/>'
+            : '<circle cx="12" cy="12" r="6.6" stroke="currentColor" stroke-width="2.6"/>';
+
+        var card =
+          '<li class="wall__i rise" style="--d:' + Math.min(i * 60, 300) + 'ms">' +
+            '<article class="wall__card">' +
+              '<div class="wall__top">' +
+                '<span class="status status--' + kind + '">' +
+                  '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' + mark + '</svg>' +
+                  esc(sub.statusLabel || 'Принято') +
+                '</span>' +
+                (when(sub.createdAt)
+                  ? '<span class="wall__date">' + esc(when(sub.createdAt)) + '</span>' : '') +
+              '</div>' +
+              body;
+
+        if (sub.reply && sub.reply.text && String(sub.reply.text).trim()) {
+          withReply++;
+          card +=
+            '<figure class="reply">' +
+              '<blockquote class="reply__text">' + esc(String(sub.reply.text).trim()) + '</blockquote>' +
+              '<figcaption class="reply__from">' +
+                '<img src="img/sprite-musya.png" alt="" width="20" height="20">' +
+                'ответ партии <b>67</b>' +
+                (when(sub.reply.at) ? ' · ' + esc(when(sub.reply.at)) : '') +
+              '</figcaption>' +
+            '</figure>';
+        }
+
+        return card + '</article></li>';
+      }).join('');
+
+      if (!html) return;
+
+      grid.innerHTML = html;
+      lead.textContent = withReply
+        ? 'Это то, что написали ученики, и что мы на это ответили. Остальные предложения разбираем — ответ приходит по коду заявки.'
+        : 'Это то, что написали ученики. Ответы появятся здесь же, как только разберём.';
+      section.hidden = false;
+
+      /* блоки появляются по прокрутке, как и всё остальное */
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+          'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        grid.querySelectorAll('.rise').forEach(function (el) { io.observe(el); });
+      } else {
+        grid.querySelectorAll('.rise').forEach(function (el) { el.classList.add('is-in'); });
+      }
+    })
+    .catch(function () { /* нет связи — раздел остаётся скрытым */ });
+})();

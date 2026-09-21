@@ -1421,3 +1421,104 @@ input[type="file"].field {
   #idea .grid2 > .note:last-child p { max-width: 62ch; }
   #idea .grid2 > .note:last-child .btn { margin-top: 4px; }
 }
+
+/* ============================================================
+   ВИТРИНА ПРЕДЛОЖЕНИЙ
+   Записки, приколотые на доску: каждая под своим углом,
+   ни одна не повторяет соседнюю.
+   ============================================================ */
+
+.wall__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: clamp(16px, 2.4vw, 28px);
+  align-items: start;
+}
+
+.wall__i { margin: 0; }
+
+.wall__card {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  padding: clamp(18px, 2.4vw, 26px);
+  box-shadow: 0 3px 0 var(--grid-bold);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 240ms var(--ease-out), box-shadow 240ms var(--ease-out);
+}
+/* каждая записка висит по-своему */
+.wall__i:nth-child(6n+1) .wall__card { --tilt: -0.9deg; }
+.wall__i:nth-child(6n+2) .wall__card { --tilt:  0.7deg; }
+.wall__i:nth-child(6n+3) .wall__card { --tilt: -0.4deg; }
+.wall__i:nth-child(6n+4) .wall__card { --tilt:  1.1deg; }
+.wall__i:nth-child(6n+5) .wall__card { --tilt: -1.2deg; }
+.wall__i:nth-child(6n+6) .wall__card { --tilt:  0.5deg; }
+
+@media (hover: hover) and (pointer: fine) {
+  .wall__card:hover {
+    transform: rotate(0deg) translateY(-3px);
+    box-shadow: 0 5px 0 var(--grid-bold), 0 18px 30px -20px rgba(27,31,42,.45);
+  }
+}
+
+/* Статус и дата всегда в одну строку: при переносе дата уезжала
+   под плашку и карточки переставали выглядеть одинаково. */
+.wall__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 0.9em;
+}
+.wall__top .status {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+.wall__date {
+  font-size: 13px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+/* в узкой колонке подпись статуса важнее даты */
+@media (max-width: 460px) {
+  .wall__top .status { font-size: 11px; }
+}
+
+/* текст предложения — то, ради чего карточка существует */
+.wall__text {
+  margin: 0;
+  font-size: clamp(17px, 1.8vw, 20px);
+  line-height: 1.5;
+  color: var(--ink);
+}
+.wall__field {
+  margin: 0 0 0.5em;
+  font-size: clamp(15px, 1.6vw, 17px);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.wall__field:last-of-type { margin-bottom: 0; }
+.wall__key {
+  display: block;
+  font-size: 11px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-faint);
+  letter-spacing: .04em;
+  margin-bottom: 3px;
+}
+
+/* ответ партии внутри карточки — плотнее, чем в проверке статуса */
+.wall__card .reply {
+  margin-top: clamp(14px, 2vh, 20px);
+  padding: clamp(13px, 1.8vw, 17px);
+  transform: none;
+}
+.wall__card .reply__text { font-size: clamp(15px, 1.6vw, 17px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wall__card { transition: none; }
+}

@@ -548,6 +548,18 @@
   </div>
 </section>
 
+<!-- ======================= ВИТРИНА ======================= -->
+<section class="band wrap wall" id="predlozheniya" hidden>
+  <div class="doodle bob" style="--rot:7deg; --phase:-2.1s; right:4%; top:9%;">
+    <img src="img/sprite-bubble.png" alt="" width="36" height="36">
+  </div>
+
+  <h2 class="band__head rise">Что уже<br>предложили</h2>
+  <p class="band__intro rise" style="--d:70ms" id="wallLead"></p>
+
+  <ul class="wall__grid" id="wallGrid"></ul>
+</section>
+
 <!-- ======================= СВОДКА ======================= -->
 <section class="wrap tally" aria-label="Коротко">
   <div class="doodle bob" style="--rot:10deg; --phase:-2.7s; left:3%; bottom:12%;">
@@ -562,7 +574,11 @@
     <span class="tally__n">3</span>
     <span class="tally__t">пункта это то, чего <em>я добиваюсь</em>: дни без формы уже согласованы, DECA и портал возможностей в работе. Обещаю усилие и отчёт, а не результат</span>
   </p>
-  <p class="tally__row rise" style="--d:160ms">
+  <p class="tally__row rise" style="--d:160ms" id="statsRow" hidden>
+    <span class="tally__n" id="statsTotal">0</span>
+    <span class="tally__t" id="statsText">предложений уже пришло от учеников</span>
+  </p>
+  <p class="tally__row rise" style="--d:240ms">
     <span class="tally__n">0</span>
     <span class="tally__t">придуманных цифр, отзывов и обещаний, которых я не смогу выполнить</span>
   </p>
